@@ -27,6 +27,8 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
   );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const currentMatch = isOffline ? localMatch : match;
 
@@ -51,7 +53,6 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
     };
 
     if (isOffline) {
-      // Modo local: actualizar solo el estado del componente
       const updated = { ...localMatch, ...payload } as Match;
       setLocalMatch(updated);
       onLocalUpdate?.(updated);
@@ -64,6 +65,39 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
     setTimeout(() => setSaved(false), 2000);
   }
 
+  async function handleClear() {
+    if (!confirmClear) {
+      setConfirmClear(true);
+      setTimeout(() => setConfirmClear(false), 3000);
+      return;
+    }
+
+    setClearing(true);
+    setConfirmClear(false);
+
+    const payload: Partial<Match> = {
+      home_goals: null,
+      away_goals: null,
+      home_penalties: null,
+      away_penalties: null,
+      played: false,
+    };
+
+    if (isOffline) {
+      const updated = { ...localMatch, ...payload } as Match;
+      setLocalMatch(updated);
+      onLocalUpdate?.(updated);
+    } else {
+      await supabase.from('matches').update(payload).eq('id', match.id);
+    }
+
+    setHomeGoals('');
+    setAwayGoals('');
+    setHomePens('');
+    setAwayPens('');
+    setClearing(false);
+  }
+
   const hg = currentMatch.home_goals;
   const ag = currentMatch.away_goals;
   const hp = currentMatch.home_penalties;
@@ -71,23 +105,17 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
   const played = isOffline ? localMatch.played : currentMatch.played;
 
   const homeWon =
-    played &&
-    hg != null &&
-    ag != null &&
+    played && hg != null && ag != null &&
     (hg > ag || (hp != null && ap != null && hp > ap));
 
   const awayWon =
-    played &&
-    hg != null &&
-    ag != null &&
+    played && hg != null && ag != null &&
     (ag > hg || (hp != null && ap != null && ap > hp));
 
   return (
     <div
       className={`rounded-xl border transition-colors ${
-        played
-          ? 'bg-gray-800/60 border-gray-700'
-          : 'bg-gray-800/30 border-gray-700/50'
+        played ? 'bg-gray-800/60 border-gray-700' : 'bg-gray-800/30 border-gray-700/50'
       } overflow-hidden`}
     >
       {/* Resultado */}
@@ -127,6 +155,7 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
       {/* Panel Admin */}
       {isAdmin && (
         <div className="border-t border-gray-700/60 bg-gray-900/50 px-3 py-3 space-y-2">
+          {/* Inputs de goles */}
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -149,6 +178,7 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
             />
           </div>
 
+          {/* Penales */}
           {showPenalties && (
             <div className="space-y-1">
               <p className="text-xs text-yellow-400 text-center">⚽ Desempate por penales</p>
@@ -176,24 +206,43 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
             </div>
           )}
 
-          <button
-            onClick={handleSave}
-            disabled={saving || homeGoals === '' || awayGoals === ''}
-            className={`w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-95 min-h-[48px] ${
-              saved
-                ? 'bg-green-600 text-white'
-                : saving
-                ? 'bg-gray-600 text-gray-400 cursor-wait'
-                : 'bg-green-500 hover:bg-green-400 disabled:bg-gray-700 disabled:text-gray-500 text-black'
-            }`}
-          >
-            {saved ? '✓ Guardado' : saving ? 'Guardando...' : 'Guardar resultado'}
-          </button>
+          {/* Botones */}
+          <div className="flex gap-2">
+            {/* Guardar */}
+            <button
+              onClick={handleSave}
+              disabled={saving || homeGoals === '' || awayGoals === ''}
+              className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all active:scale-95 min-h-[48px] ${
+                saved
+                  ? 'bg-green-600 text-white'
+                  : saving
+                  ? 'bg-gray-600 text-gray-400 cursor-wait'
+                  : 'bg-green-500 hover:bg-green-400 disabled:bg-gray-700 disabled:text-gray-500 text-black'
+              }`}
+            >
+              {saved ? '✓ Guardado' : saving ? 'Guardando...' : 'Guardar'}
+            </button>
+
+            {/* Borrar resultado */}
+            {played && (
+              <button
+                onClick={handleClear}
+                disabled={clearing}
+                className={`px-4 py-3 rounded-xl font-bold text-sm transition-all active:scale-95 min-h-[48px] min-w-[80px] ${
+                  confirmClear
+                    ? 'bg-red-600 text-white animate-pulse'
+                    : clearing
+                    ? 'bg-gray-700 text-gray-500 cursor-wait'
+                    : 'bg-gray-700 hover:bg-red-900/50 text-gray-400 hover:text-red-400 border border-gray-600 hover:border-red-700'
+                }`}
+              >
+                {clearing ? '...' : confirmClear ? '¿Seguro?' : '🗑 Borrar'}
+              </button>
+            )}
+          </div>
 
           {isOffline && saved && (
-            <p className="text-xs text-yellow-500 text-center">
-              ⚠ Modo local — no se guarda en la nube
-            </p>
+            <p className="text-xs text-yellow-500 text-center">⚠ Modo local — no se guarda en la nube</p>
           )}
         </div>
       )}

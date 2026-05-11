@@ -184,7 +184,15 @@ export default function Home() {
             )}
 
             {activeTab === 'bracket' && (
-              <BracketView matches={matches} isAdmin={isAdmin} isOffline={isOffline} />
+              <BracketView
+                matches={matches}
+                isAdmin={isAdmin}
+                isOffline={isOffline}
+                standingsA={standingsA}
+                standingsB={standingsB}
+                standingsC={standingsC}
+                best2nd={best2nd}
+              />
             )}
 
             {activeTab === 'info' && <TournamentInfo />}
