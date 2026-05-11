@@ -13,56 +13,56 @@ interface ScheduleSlot { time: string; matches: SlotEntry[]; }
 
 const SCHEDULE: ScheduleSlot[] = [
   {
-    time: '08:00 – 08:30',
+    time: '08:15 – 08:40',
     matches: [
       { cancha: 1, home: 'Planeta Thcia',  away: 'Palangana',      zone: 'A' },
       { cancha: 2, home: 'La mastur',       away: 'Los +capitos',   zone: 'B' },
     ],
   },
   {
-    time: '08:30 – 09:00',
+    time: '08:40 – 09:05',
     matches: [
       { cancha: 1, home: 'Los Sumatorias', away: 'Los Secanucas',  zone: 'A' },
       { cancha: 2, home: 'Angry Kirk',     away: '67 Maquinas',    zone: 'B' },
     ],
   },
   {
-    time: '09:00 – 09:30',
+    time: '09:05 – 09:30',
     matches: [
       { cancha: 1, home: 'Planeta Thcia',  away: 'Los Sumatorias', zone: 'A' },
       { cancha: 2, home: 'Milanesa',       away: 'La changuita',   zone: 'C' },
     ],
   },
   {
-    time: '09:30 – 10:00',
+    time: '09:30 – 09:55',
     matches: [
       { cancha: 1, home: 'Palangana',      away: 'Los Secanucas',  zone: 'A' },
       { cancha: 2, home: 'La mastur',      away: '67 Maquinas',    zone: 'B' },
     ],
   },
   {
-    time: '10:00 – 10:30',
+    time: '09:55 – 10:20',
     matches: [
       { cancha: 1, home: 'El suplantaso',  away: 'Milanesa',       zone: 'C' },
       { cancha: 2, home: 'Los +capitos',   away: 'Angry Kirk',     zone: 'B' },
     ],
   },
   {
-    time: '10:30 – 11:00',
+    time: '10:20 – 10:45',
     matches: [
       { cancha: 1, home: 'Planeta Thcia',  away: 'Los Secanucas',  zone: 'A' },
       { cancha: 2, home: 'Los Sumatorias', away: 'Palangana',      zone: 'A' },
     ],
   },
   {
-    time: '11:00 – 11:30',
+    time: '10:45 – 11:10',
     matches: [
       { cancha: 1, home: 'La mastur',      away: 'Angry Kirk',     zone: 'B' },
       { cancha: 2, home: 'Los +capitos',   away: '67 Maquinas',    zone: 'B' },
     ],
   },
   {
-    time: '11:30 – 12:00',
+    time: '11:10 – 11:35',
     matches: [
       { cancha: 1, home: 'El suplantaso',  away: 'La changuita',   zone: 'C' },
       { cancha: 2, home: null,             away: null,             zone: null },
@@ -266,7 +266,7 @@ export default function ScheduledFixture({
         labelColor="text-orange-400"
         borderColor="border-orange-600/40"
         headerBg="bg-orange-900/20 border-orange-700/30"
-        time="12:00 – 12:20"
+        time="11:35 – 11:55"
         cancha1Home={second_C}
         cancha1Away={best2ndTeam}
         match1={repechajeMatch}
@@ -280,7 +280,7 @@ export default function ScheduledFixture({
         labelColor="text-purple-400"
         borderColor="border-purple-600/30"
         headerBg="bg-purple-900/20 border-purple-700/30"
-        time="12:20 – 12:55"
+        time="11:55 – 12:30"
         cancha1Home={first_B}
         cancha1Away={ganRepechaje}
         cancha2Home={first_C}
@@ -297,7 +297,7 @@ export default function ScheduledFixture({
         labelColor="text-yellow-400"
         borderColor="border-yellow-600/50"
         headerBg="bg-yellow-900/30 border-yellow-700/30"
-        time="12:55 – 13:35"
+        time="12:30 – 13:10"
         cancha1Home={ganSemi1}
         cancha1Away={ganSemi2}
         match1={finalMatch}
