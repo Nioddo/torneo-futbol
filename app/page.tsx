@@ -158,7 +158,15 @@ export default function Home() {
         ) : (
           <>
             {activeTab === 'fixture' && (
-              <ScheduledFixture matches={matches} isAdmin={isAdmin} isOffline={isOffline} />
+              <ScheduledFixture
+                matches={matches}
+                isAdmin={isAdmin}
+                isOffline={isOffline}
+                standingsA={standingsA}
+                standingsB={standingsB}
+                standingsC={standingsC}
+                best2nd={best2nd}
+              />
             )}
 
             {activeTab === 'standings' && (
