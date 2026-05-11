@@ -8,64 +8,76 @@ interface SlotEntry {
   home: string | null;
   away: string | null;
   zone: string | null;
+  /** Si es true, esta cancha muestra el repechaje en lugar de un partido de grupos */
+  repechaje?: boolean;
 }
 interface ScheduleSlot { time: string; matches: SlotEntry[]; }
 
+// ─────────────────────────────────────────────────────────────────
+// HORARIO OPTIMIZADO
+//  • Inicio: 08:10   • Partidos: 30 min   • Final máx: 13:20
+//  • Slot 7: Último partido C (El suplantaso vs La changuita)
+//            + Los +capitos vs 67 Maquinas (B)
+//  • Slot 8: La mastur vs Angry Kirk (último B) en C1
+//            ⚡ Repechaje en C2 SIMULTÁNEO (Zona C ya terminó)
+// ─────────────────────────────────────────────────────────────────
 const SCHEDULE: ScheduleSlot[] = [
   {
-    time: '08:15 – 08:40',
+    time: '08:10 – 08:40',
     matches: [
       { cancha: 1, home: 'Planeta Thcia',  away: 'Palangana',      zone: 'A' },
       { cancha: 2, home: 'La mastur',       away: 'Los +capitos',   zone: 'B' },
     ],
   },
   {
-    time: '08:40 – 09:05',
+    time: '08:40 – 09:10',
     matches: [
       { cancha: 1, home: 'Los Sumatorias', away: 'Los Secanucas',  zone: 'A' },
       { cancha: 2, home: 'Angry Kirk',     away: '67 Maquinas',    zone: 'B' },
     ],
   },
   {
-    time: '09:05 – 09:30',
+    time: '09:10 – 09:40',
     matches: [
       { cancha: 1, home: 'Planeta Thcia',  away: 'Los Sumatorias', zone: 'A' },
       { cancha: 2, home: 'Milanesa',       away: 'La changuita',   zone: 'C' },
     ],
   },
   {
-    time: '09:30 – 09:55',
+    time: '09:40 – 10:10',
     matches: [
       { cancha: 1, home: 'Palangana',      away: 'Los Secanucas',  zone: 'A' },
       { cancha: 2, home: 'La mastur',      away: '67 Maquinas',    zone: 'B' },
     ],
   },
   {
-    time: '09:55 – 10:20',
+    time: '10:10 – 10:40',
     matches: [
       { cancha: 1, home: 'El suplantaso',  away: 'Milanesa',       zone: 'C' },
       { cancha: 2, home: 'Los +capitos',   away: 'Angry Kirk',     zone: 'B' },
     ],
   },
   {
-    time: '10:20 – 10:45',
+    time: '10:40 – 11:10',
     matches: [
       { cancha: 1, home: 'Planeta Thcia',  away: 'Los Secanucas',  zone: 'A' },
       { cancha: 2, home: 'Los Sumatorias', away: 'Palangana',      zone: 'A' },
     ],
   },
   {
-    time: '10:45 – 11:10',
+    // Zona C cierra en este slot → standings disponibles al terminar
+    time: '11:10 – 11:40',
     matches: [
-      { cancha: 1, home: 'La mastur',      away: 'Angry Kirk',     zone: 'B' },
+      { cancha: 1, home: 'El suplantaso',  away: 'La changuita',   zone: 'C' },
       { cancha: 2, home: 'Los +capitos',   away: '67 Maquinas',    zone: 'B' },
     ],
   },
   {
-    time: '11:10 – 11:35',
+    // Último B en C1 · Repechaje en C2 (simultáneo, canchas bien usadas)
+    time: '11:40 – 12:10',
     matches: [
-      { cancha: 1, home: 'El suplantaso',  away: 'La changuita',   zone: 'C' },
-      { cancha: 2, home: null,             away: null,             zone: null },
+      { cancha: 1, home: 'La mastur',      away: 'Angry Kirk',     zone: 'B' },
+      { cancha: 2, home: null,             away: null,             zone: null, repechaje: true },
     ],
   },
 ];
@@ -95,7 +107,7 @@ function getWinner(m: Match | undefined): string | undefined {
   return m.away_team;
 }
 
-// Muestra el matchup de una fase final con nombres reales o placeholders
+// ── Componente para las fases eliminatorias (semis y final) ──────
 function KnockoutSlot({
   label,
   labelColor,
@@ -134,20 +146,16 @@ function KnockoutSlot({
 
   return (
     <div className={`rounded-xl border overflow-hidden ${borderColor}`}>
-      {/* Header */}
       <div className={`px-3 py-2 flex items-center justify-between border-b ${headerBg}`}>
         <span className="text-xs font-bold text-gray-300">🕐 {time}</span>
         <span className={`text-xs font-bold ${labelColor}`}>{label}</span>
       </div>
-
       <div className="divide-y divide-gray-700/30">
         {slots.map((s) => (
           <div key={s.cancha} className="px-3 py-2.5 bg-gray-800/20">
             {slots.length > 1 && (
               <p className="text-xs font-bold text-gray-600 mb-2">Cancha {s.cancha}</p>
             )}
-
-            {/* Matchup preview — siempre visible */}
             <div className="flex items-center justify-between gap-2 mb-2 px-1">
               <span className={`text-xs font-semibold truncate ${s.home ? 'text-gray-200' : 'text-gray-600 italic'}`}>
                 {s.home ?? 'A definir…'}
@@ -157,8 +165,6 @@ function KnockoutSlot({
                 {s.away ?? 'A definir…'}
               </span>
             </div>
-
-            {/* Tarjeta del partido (si existe en DB) */}
             {s.match ? (
               <MatchCard match={s.match} isAdmin={isAdmin} isOffline={isOffline} />
             ) : (
@@ -192,16 +198,16 @@ export default function ScheduledFixture({
   standingsC,
   best2nd,
 }: Props) {
-  const groupMatches = matches.filter((m) => m.phase === 'group');
+  const groupMatches   = matches.filter((m) => m.phase === 'group');
   const repechajeMatch = matches.find((m) => m.phase === 'repechaje');
-  const semis = matches.filter((m) => m.phase === 'semi');
-  const finalMatch = matches.find((m) => m.phase === 'final');
+  const semis          = matches.filter((m) => m.phase === 'semi');
+  const finalMatch     = matches.find((m) => m.phase === 'final');
 
-  // ── Nombres reales desde standings ────────────────────────────────
-  const first_A   = standingsA[0]?.team;
-  const first_B   = standingsB[0]?.team;
-  const first_C   = standingsC[0]?.team;
-  const second_C  = standingsC[1]?.team;
+  // ── Nombres reales desde standings ──────────────────────────────
+  const first_A     = standingsA[0]?.team;
+  const first_B     = standingsB[0]?.team;
+  const first_C     = standingsC[0]?.team;
+  const second_C    = standingsC[1]?.team;
   const best2ndTeam = best2nd?.team;
 
   const ganRepechaje = getWinner(repechajeMatch);
@@ -224,6 +230,38 @@ export default function ScheduledFixture({
           </div>
           <div className="divide-y divide-gray-700/50">
             {slot.matches.map((entry) => {
+
+              // ── Cancha del Repechaje (slot 8, cancha 2) ─────────
+              if (entry.repechaje) {
+                return (
+                  <div key={entry.cancha} className="px-3 py-2.5 bg-orange-950/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-bold text-gray-500">Cancha {entry.cancha}</span>
+                      <span className="text-xs font-bold px-1.5 py-0.5 rounded border text-orange-400 bg-orange-500/10 border-orange-500/30">
+                        ⚡ Repechaje
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 mb-2 px-1">
+                      <span className={`text-xs font-semibold truncate ${second_C ? 'text-gray-200' : 'text-gray-600 italic'}`}>
+                        {second_C ?? 'A definir…'}
+                      </span>
+                      <span className="text-gray-600 text-xs shrink-0 font-bold">vs</span>
+                      <span className={`text-xs font-semibold truncate text-right ${best2ndTeam ? 'text-gray-200' : 'text-gray-600 italic'}`}>
+                        {best2ndTeam ?? 'A definir…'}
+                      </span>
+                    </div>
+                    {repechajeMatch ? (
+                      <MatchCard match={repechajeMatch} isAdmin={isAdmin} isOffline={isOffline} />
+                    ) : (
+                      <div className="rounded-xl border border-orange-700/30 bg-orange-900/10 px-3 py-2 text-center">
+                        <span className="text-xs text-orange-600 italic">2º Zona C vs Mejor 2º (A o B)</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              // ── Partido de grupos normal ─────────────────────────
               const match = findMatch(groupMatches, entry.home, entry.away);
               return (
                 <div key={entry.cancha} className="px-3 py-2.5 bg-gray-800/20">
@@ -260,27 +298,13 @@ export default function ScheduledFixture({
         Fase Final · Eliminación directa
       </p>
 
-      {/* REPECHAJE */}
-      <KnockoutSlot
-        label="⚡ Repechaje"
-        labelColor="text-orange-400"
-        borderColor="border-orange-600/40"
-        headerBg="bg-orange-900/20 border-orange-700/30"
-        time="11:35 – 11:55"
-        cancha1Home={second_C}
-        cancha1Away={best2ndTeam}
-        match1={repechajeMatch}
-        isAdmin={isAdmin}
-        isOffline={isOffline}
-      />
-
       {/* SEMIFINALES */}
       <KnockoutSlot
         label="🟣 Semifinales"
         labelColor="text-purple-400"
         borderColor="border-purple-600/30"
         headerBg="bg-purple-900/20 border-purple-700/30"
-        time="11:55 – 12:30"
+        time="12:10 – 12:45"
         cancha1Home={first_B}
         cancha1Away={ganRepechaje}
         cancha2Home={first_C}
@@ -297,7 +321,7 @@ export default function ScheduledFixture({
         labelColor="text-yellow-400"
         borderColor="border-yellow-600/50"
         headerBg="bg-yellow-900/30 border-yellow-700/30"
-        time="12:30 – 13:10"
+        time="12:45 – 13:20"
         cancha1Home={ganSemi1}
         cancha1Away={ganSemi2}
         match1={finalMatch}
