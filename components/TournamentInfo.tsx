@@ -94,7 +94,6 @@ export default function TournamentInfo() {
               <div className="text-xs text-gray-400 mt-1 space-y-1">
                 <p>· <strong className="text-gray-200">Semi 1:</strong> 1º Zona B vs Ganador Repechaje</p>
                 <p>· <strong className="text-gray-200">Semi 2:</strong> 1º Zona C vs 1º Zona A</p>
-                <p className="text-gray-500 italic">El 1º B y el 1º C solo pueden cruzarse en la Final.</p>
               </div>
             </div>
           </div>
