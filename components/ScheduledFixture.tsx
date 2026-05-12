@@ -78,14 +78,15 @@ function findMatch(pool: Match[], home: string, away: string): Match | undefined
   );
 }
 
-function getWinner(m: Match | undefined): string | undefined {
+function getWinner(m: Match | undefined, homeReal?: string, awayReal?: string): string | undefined {
   if (!m?.played) return undefined;
   const hg = m.home_goals ?? 0;
   const ag = m.away_goals ?? 0;
   const hp = m.home_penalties;
   const ap = m.away_penalties;
-  if (hg > ag || (hg === ag && hp != null && ap != null && hp > ap)) return m.home_team;
-  return m.away_team;
+  const homeWon = hg > ag || (hg === ag && hp != null && ap != null && hp > ap);
+  if (homeWon) return homeReal ?? m.home_team;
+  return awayReal ?? m.away_team;
 }
 
 // ── Slot de fase eliminatoria ────────────────────────────────────
@@ -104,8 +105,7 @@ function KnockoutSlot({
   borderColor: string;
   headerBg: string;
   time: string;
-  matches: { cancha: number; home: string | undefined; away: string | undefined; match: Match | undefined }[];
-  isAdmin: boolean;
+  matches: { cancha: number; home: string | undefined; away: string | undefined; match: Match | undefined }[];  isAdmin: boolean;
   isOffline: boolean;
 }) {
   return (
@@ -130,7 +130,7 @@ function KnockoutSlot({
               </span>
             </div>
             {s.match ? (
-              <MatchCard match={s.match} isAdmin={isAdmin} isOffline={isOffline} />
+              <MatchCard match={s.match} isAdmin={isAdmin} isOffline={isOffline} homeTeamOverride={s.home} awayTeamOverride={s.away} />
             ) : (
               <div className="rounded-xl border border-gray-700/30 bg-gray-800/20 px-3 py-2 text-center">
                 <span className="text-xs text-gray-600 italic">Partido no disponible aún</span>
@@ -178,14 +178,14 @@ export default function ScheduledFixture({
   const second_D = standingsD[1]?.team;
 
   // Ganadores de cuartos
-  const ganQ1 = getWinner(quarters[0]);
-  const ganQ2 = getWinner(quarters[1]);
-  const ganQ3 = getWinner(quarters[2]);
-  const ganQ4 = getWinner(quarters[3]);
+  const ganQ1 = getWinner(quarters[0], first_A, second_B);
+  const ganQ2 = getWinner(quarters[1], first_B, second_A);
+  const ganQ3 = getWinner(quarters[2], first_C, second_D);
+  const ganQ4 = getWinner(quarters[3], first_D, second_C);
 
   // Ganadores de semis
-  const ganSemi1 = getWinner(semis[0]);
-  const ganSemi2 = getWinner(semis[1]);
+  const ganSemi1 = getWinner(semis[0], ganQ1, ganQ3);
+  const ganSemi2 = getWinner(semis[1], ganQ2, ganQ4);
 
   return (
     <div className="space-y-3">
