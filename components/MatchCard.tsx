@@ -9,9 +9,11 @@ interface MatchCardProps {
   isAdmin: boolean;
   isOffline?: boolean;
   onLocalUpdate?: (updated: Match) => void;
+  homeTeamOverride?: string;
+  awayTeamOverride?: string;
 }
 
-export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUpdate }: MatchCardProps) {
+export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUpdate, homeTeamOverride, awayTeamOverride }: MatchCardProps) {
   const [localMatch, setLocalMatch] = useState<Match>(match);
   const [homeGoals, setHomeGoals] = useState<string>(
     match.home_goals != null ? String(match.home_goals) : ''
@@ -122,7 +124,7 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
       <div className="flex items-center gap-2 px-3 py-3">
         <div className="flex-1 min-w-0">
           <p className={`text-sm font-semibold truncate ${homeWon ? 'text-green-400' : 'text-gray-200'}`}>
-            {currentMatch.home_team}
+            {homeTeamOverride ?? currentMatch.home_team}
           </p>
         </div>
 
@@ -147,7 +149,7 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
 
         <div className="flex-1 min-w-0 text-right">
           <p className={`text-sm font-semibold truncate ${awayWon ? 'text-green-400' : 'text-gray-200'}`}>
-            {currentMatch.away_team}
+            {awayTeamOverride ?? currentMatch.away_team}
           </p>
         </div>
       </div>

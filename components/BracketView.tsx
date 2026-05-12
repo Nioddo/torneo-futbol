@@ -43,11 +43,15 @@ function MatchSlot({
   isAdmin,
   isOffline,
   label,
+  homeTeamOverride,
+  awayTeamOverride,
 }: {
   match: Match | undefined;
   isAdmin: boolean;
   isOffline: boolean;
   label: string;
+  homeTeamOverride?: string;
+  awayTeamOverride?: string;
 }) {
   if (!match) return null;
   return (
@@ -55,7 +59,7 @@ function MatchSlot({
       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1.5 px-1">
         {label}
       </p>
-      <MatchCard match={match} isAdmin={isAdmin} isOffline={isOffline} />
+      <MatchCard match={match} isAdmin={isAdmin} isOffline={isOffline} homeTeamOverride={homeTeamOverride} awayTeamOverride={awayTeamOverride} />
     </div>
   );
 }
@@ -189,7 +193,7 @@ export default function BracketView({
             <TeamChip team={ganQ1} label="Ganador C1" color="bg-cyan-400" pending={!ganQ1} />
             <TeamChip team={ganQ3} label="Ganador C3" color="bg-cyan-400" pending={!ganQ3} />
           </div>
-          <MatchSlot match={semi1} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
+          <MatchSlot match={semi1} isAdmin={isAdmin} isOffline={isOffline} label="Partido" homeTeamOverride={ganQ1} awayTeamOverride={ganQ3} />
         </div>
         {/* Semi 2 */}
         <div>
@@ -198,7 +202,7 @@ export default function BracketView({
             <TeamChip team={ganQ2} label="Ganador C2" color="bg-cyan-400" pending={!ganQ2} />
             <TeamChip team={ganQ4} label="Ganador C4" color="bg-cyan-400" pending={!ganQ4} />
           </div>
-          <MatchSlot match={semi2} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
+          <MatchSlot match={semi2} isAdmin={isAdmin} isOffline={isOffline} label="Partido" homeTeamOverride={ganQ2} awayTeamOverride={ganQ4} />
         </div>
       </PhaseBlock>
 
@@ -208,7 +212,7 @@ export default function BracketView({
           <TeamChip team={ganSemi1} label="Ganador Semi 1" color="bg-yellow-400" pending={!ganSemi1} />
           <TeamChip team={ganSemi2} label="Ganador Semi 2" color="bg-yellow-400" pending={!ganSemi2} />
         </div>
-        <MatchSlot match={final} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
+        <MatchSlot match={final} isAdmin={isAdmin} isOffline={isOffline} label="Partido" homeTeamOverride={ganSemi1} awayTeamOverride={ganSemi2} />
       </PhaseBlock>
 
       {/* ── Info estructura ───────────────────────────────────────── */}
