@@ -121,22 +121,23 @@ export default function BracketView({
   const first_D  = standingsD[0]?.team;
   const second_D = standingsD[1]?.team;
 
-  function getWinner(m: Match | undefined): string | undefined {
+  function getWinner(m: Match | undefined, homeReal?: string, awayReal?: string): string | undefined {
     if (!m?.played) return undefined;
     const hg = m.home_goals ?? 0;
     const ag = m.away_goals ?? 0;
     const hp = m.home_penalties;
     const ap = m.away_penalties;
-    if (hg > ag || (hg === ag && hp != null && ap != null && hp > ap)) return m.home_team;
-    return m.away_team;
+    const homeWon = hg > ag || (hg === ag && hp != null && ap != null && hp > ap);
+    if (homeWon) return homeReal ?? m.home_team;
+    return awayReal ?? m.away_team;
   }
 
-  const ganQ1    = getWinner(q1);
-  const ganQ2    = getWinner(q2);
-  const ganQ3    = getWinner(q3);
-  const ganQ4    = getWinner(q4);
-  const ganSemi1 = getWinner(semi1);
-  const ganSemi2 = getWinner(semi2);
+  const ganQ1    = getWinner(q1, first_A, second_B);
+  const ganQ2    = getWinner(q2, first_B, second_A);
+  const ganQ3    = getWinner(q3, first_C, second_D);
+  const ganQ4    = getWinner(q4, first_D, second_C);
+  const ganSemi1 = getWinner(semi1, ganQ1, ganQ3);
+  const ganSemi2 = getWinner(semi2, ganQ2, ganQ4);
 
   return (
     <div className="space-y-7">
