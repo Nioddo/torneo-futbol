@@ -110,8 +110,8 @@ export default function TournamentInfo() {
             <div>
               <p className="text-sm font-semibold text-white">Tiempos — Fase de Grupos</p>
               <p className="text-xs text-gray-400 mt-0.5">
-                2 × <strong className="text-gray-200">12 min</strong> + 3 min entretiempo + 3 min recambio
-                <span className="text-gray-600"> (bloques de 30 min)</span>
+                2 × <strong className="text-gray-200">12 min</strong> + 1 min entretiempo
+                <span className="text-gray-600"> (bloques de 25 min)</span>
               </p>
             </div>
           </div>
@@ -121,8 +121,8 @@ export default function TournamentInfo() {
             <div>
               <p className="text-sm font-semibold text-white">Tiempos — Fase Final</p>
               <p className="text-xs text-gray-400 mt-0.5">
-                2 × <strong className="text-gray-200">11 min</strong> + 3 min entretiempo + 10 min penales
-                <span className="text-gray-600"> (bloques de 35–40 min)</span>
+                2 × <strong className="text-gray-200">12 min</strong> + 1 min entretiempo + (10 min penales)
+                <span className="text-gray-600"> (bloques de 25/35 min)</span>
               </p>
             </div>
           </div>
