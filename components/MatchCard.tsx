@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Match } from '@/types';
 import { supabase } from '@/lib/supabase';
 
@@ -31,8 +31,22 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
   const [saved, setSaved] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  // En modo online usamos localMatch para reflejar el resultado inmediatamente tras guardar
+  const [useLocal, setUseLocal] = useState(false);
 
-  const currentMatch = isOffline ? localMatch : match;
+  // Cuando el prop match se actualiza (vía Realtime), sincronizamos el estado local
+  useEffect(() => {
+    if (!isOffline) {
+      setLocalMatch(match);
+      setUseLocal(false);
+      setHomeGoals(match.home_goals != null ? String(match.home_goals) : '');
+      setAwayGoals(match.away_goals != null ? String(match.away_goals) : '');
+      setHomePens(match.home_penalties != null ? String(match.home_penalties) : '');
+      setAwayPens(match.away_penalties != null ? String(match.away_penalties) : '');
+    }
+  }, [match, isOffline]);
+
+  const currentMatch = (isOffline || useLocal) ? localMatch : match;
 
   const isDraw =
     currentMatch.phase !== 'group' &&
@@ -59,6 +73,9 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
       setLocalMatch(updated);
       onLocalUpdate?.(updated);
     } else {
+      const updated = { ...match, ...payload } as Match;
+      setLocalMatch(updated);
+      setUseLocal(true);
       await supabase.from('matches').update(payload).eq('id', match.id);
     }
 
@@ -90,6 +107,8 @@ export default function MatchCard({ match, isAdmin, isOffline = false, onLocalUp
       setLocalMatch(updated);
       onLocalUpdate?.(updated);
     } else {
+      setLocalMatch({ ...match, ...payload } as Match);
+      setUseLocal(true);
       await supabase.from('matches').update(payload).eq('id', match.id);
     }
 
