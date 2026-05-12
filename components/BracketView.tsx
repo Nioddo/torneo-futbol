@@ -10,7 +10,7 @@ interface Props {
   standingsA: TeamStanding[];
   standingsB: TeamStanding[];
   standingsC: TeamStanding[];
-  best2nd: TeamStanding | null;
+  standingsD: TeamStanding[];
 }
 
 function PhaseBlock({
@@ -94,99 +94,116 @@ export default function BracketView({
   standingsA,
   standingsB,
   standingsC,
-  best2nd,
+  standingsD,
 }: Props) {
-  const repechaje = matches.find((m) => m.phase === 'repechaje');
-  const semis = matches.filter((m) => m.phase === 'semi');
-  const final = matches.find((m) => m.phase === 'final');
+  const quarters = matches.filter((m) => m.phase === 'quarter');
+  const semis    = matches.filter((m) => m.phase === 'semi');
+  const final    = matches.find((m) => m.phase === 'final');
 
+  const q1 = quarters[0];
+  const q2 = quarters[1];
+  const q3 = quarters[2];
+  const q4 = quarters[3];
   const semi1 = semis[0];
   const semi2 = semis[1];
 
-  // ── Nombres reales según standings actuales ──────────────────────
-  const first_A = standingsA[0]?.team;
-  const first_B = standingsB[0]?.team;
-  const first_C = standingsC[0]?.team;
+  // Nombres reales desde standings
+  const first_A  = standingsA[0]?.team;
+  const second_A = standingsA[1]?.team;
+  const first_B  = standingsB[0]?.team;
+  const second_B = standingsB[1]?.team;
+  const first_C  = standingsC[0]?.team;
   const second_C = standingsC[1]?.team;
-  const best2ndTeam = best2nd?.team;
+  const first_D  = standingsD[0]?.team;
+  const second_D = standingsD[1]?.team;
 
-  // Ganadores de repechaje y semis (si ya se jugaron)
-  const ganRepechaje = (() => {
-    if (!repechaje?.played) return undefined;
-    const hg = repechaje.home_goals ?? 0;
-    const ag = repechaje.away_goals ?? 0;
-    const hp = repechaje.home_penalties;
-    const ap = repechaje.away_penalties;
-    if (hg > ag || (hg === ag && hp != null && ap != null && hp > ap)) return repechaje.home_team;
-    return repechaje.away_team;
-  })();
+  function getWinner(m: Match | undefined): string | undefined {
+    if (!m?.played) return undefined;
+    const hg = m.home_goals ?? 0;
+    const ag = m.away_goals ?? 0;
+    const hp = m.home_penalties;
+    const ap = m.away_penalties;
+    if (hg > ag || (hg === ag && hp != null && ap != null && hp > ap)) return m.home_team;
+    return m.away_team;
+  }
 
-  const ganSemi1 = (() => {
-    if (!semi1?.played) return undefined;
-    const hg = semi1.home_goals ?? 0;
-    const ag = semi1.away_goals ?? 0;
-    const hp = semi1.home_penalties;
-    const ap = semi1.away_penalties;
-    if (hg > ag || (hg === ag && hp != null && ap != null && hp > ap)) return semi1.home_team;
-    return semi1.away_team;
-  })();
-
-  const ganSemi2 = (() => {
-    if (!semi2?.played) return undefined;
-    const hg = semi2.home_goals ?? 0;
-    const ag = semi2.away_goals ?? 0;
-    const hp = semi2.home_penalties;
-    const ap = semi2.away_penalties;
-    if (hg > ag || (hg === ag && hp != null && ap != null && hp > ap)) return semi2.home_team;
-    return semi2.away_team;
-  })();
+  const ganQ1    = getWinner(q1);
+  const ganQ2    = getWinner(q2);
+  const ganQ3    = getWinner(q3);
+  const ganQ4    = getWinner(q4);
+  const ganSemi1 = getWinner(semi1);
+  const ganSemi2 = getWinner(semi2);
 
   return (
     <div className="space-y-7">
 
-      {/* ── REPECHAJE ─────────────────────────────────────────────── */}
-      <PhaseBlock
-        label="Repechaje (Play-in)"
-        sublabel="El ganador va a Semifinal 1"
-        color="bg-orange-500"
-      >
-        {/* Chips con nombres reales */}
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 space-y-2 mb-2">
-          <TeamChip team={second_C}   label="2º Zona C"        color="bg-orange-400" />
-          <TeamChip team={best2ndTeam} label="Mejor 2º (A o B)" color="bg-orange-400" />
+      {/* ── CUARTOS DE FINAL ─────────────────────────────────────── */}
+      <PhaseBlock label="Cuartos de Final" sublabel="Turno 1 · 10:45 – 11:20" color="bg-cyan-500">
+        {/* C1 */}
+        <div>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 px-1">C1 · Cancha 1</p>
+          <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 space-y-2 mb-2">
+            <TeamChip team={first_A}  label="1º Zona A" color="bg-blue-400" />
+            <TeamChip team={second_B} label="2º Zona B" color="bg-purple-400" pending={!second_B} />
+          </div>
+          <MatchSlot match={q1} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
         </div>
-        <MatchSlot match={repechaje} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
+        {/* C2 */}
+        <div>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 px-1">C2 · Cancha 2</p>
+          <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 space-y-2 mb-2">
+            <TeamChip team={first_B}  label="1º Zona B" color="bg-purple-400" />
+            <TeamChip team={second_A} label="2º Zona A" color="bg-blue-400" pending={!second_A} />
+          </div>
+          <MatchSlot match={q2} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
+        </div>
+      </PhaseBlock>
+
+      <PhaseBlock label="Cuartos de Final" sublabel="Turno 2 · 11:20 – 11:55" color="bg-cyan-500">
+        {/* C3 */}
+        <div>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 px-1">C3 · Cancha 1</p>
+          <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 space-y-2 mb-2">
+            <TeamChip team={first_C}  label="1º Zona C" color="bg-orange-400" />
+            <TeamChip team={second_D} label="2º Zona D" color="bg-green-400" pending={!second_D} />
+          </div>
+          <MatchSlot match={q3} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
+        </div>
+        {/* C4 */}
+        <div>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 px-1">C4 · Cancha 2</p>
+          <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 space-y-2 mb-2">
+            <TeamChip team={first_D}  label="1º Zona D" color="bg-green-400" />
+            <TeamChip team={second_C} label="2º Zona C" color="bg-orange-400" pending={!second_C} />
+          </div>
+          <MatchSlot match={q4} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
+        </div>
       </PhaseBlock>
 
       {/* ── SEMIFINALES ───────────────────────────────────────────── */}
-      <PhaseBlock label="Semifinales" color="bg-purple-500">
+      <PhaseBlock label="Semifinales" sublabel="12:00 – 12:35" color="bg-purple-500">
         {/* Semi 1 */}
         <div>
-          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 px-1">
-            Semi 1
-          </p>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 px-1">Semi 1 · Cancha 1</p>
           <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 space-y-2 mb-2">
-            <TeamChip team={first_B}      label="1º Zona B"          color="bg-purple-400" />
-            <TeamChip team={ganRepechaje} label="Ganador Repechaje"  color="bg-orange-400" pending={!ganRepechaje} />
+            <TeamChip team={ganQ1} label="Ganador C1" color="bg-cyan-400" pending={!ganQ1} />
+            <TeamChip team={ganQ3} label="Ganador C3" color="bg-cyan-400" pending={!ganQ3} />
           </div>
           <MatchSlot match={semi1} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
         </div>
-
         {/* Semi 2 */}
         <div>
-          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 px-1">
-            Semi 2
-          </p>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 px-1">Semi 2 · Cancha 2</p>
           <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 space-y-2 mb-2">
-            <TeamChip team={first_C} label="1º Zona C" color="bg-orange-400" />
-            <TeamChip team={first_A} label="1º Zona A" color="bg-blue-400" />
+            <TeamChip team={ganQ2} label="Ganador C2" color="bg-cyan-400" pending={!ganQ2} />
+            <TeamChip team={ganQ4} label="Ganador C4" color="bg-cyan-400" pending={!ganQ4} />
           </div>
           <MatchSlot match={semi2} isAdmin={isAdmin} isOffline={isOffline} label="Partido" />
         </div>
       </PhaseBlock>
 
       {/* ── GRAN FINAL ────────────────────────────────────────────── */}
-      <PhaseBlock label="Gran Final 🏆" color="bg-yellow-500">
+      <PhaseBlock label="Gran Final 🏆" sublabel="12:35 – 13:15" color="bg-yellow-500">
         <div className="bg-gray-800/50 border border-yellow-700/30 rounded-xl px-4 py-3 space-y-2 mb-2">
           <TeamChip team={ganSemi1} label="Ganador Semi 1" color="bg-yellow-400" pending={!ganSemi1} />
           <TeamChip team={ganSemi2} label="Ganador Semi 2" color="bg-yellow-400" pending={!ganSemi2} />
@@ -199,16 +216,28 @@ export default function BracketView({
         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Estructura de llaves</p>
         <div className="space-y-2 text-xs text-gray-400 leading-relaxed">
           <div className="flex gap-2">
-            <span className="w-2 h-2 rounded-full bg-orange-400 mt-1 shrink-0" />
-            <span><strong className="text-gray-200">Repechaje:</strong> 2º Zona C vs Mejor 2º (entre 2º Zona A y 2º Zona B)</span>
+            <span className="w-2 h-2 rounded-full bg-cyan-400 mt-1 shrink-0" />
+            <span><strong className="text-gray-200">C1:</strong> 1º Zona A vs 2º Zona B</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 mt-1 shrink-0" />
+            <span><strong className="text-gray-200">C2:</strong> 1º Zona B vs 2º Zona A</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 mt-1 shrink-0" />
+            <span><strong className="text-gray-200">C3:</strong> 1º Zona C vs 2º Zona D</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 mt-1 shrink-0" />
+            <span><strong className="text-gray-200">C4:</strong> 1º Zona D vs 2º Zona C</span>
           </div>
           <div className="flex gap-2">
             <span className="w-2 h-2 rounded-full bg-purple-400 mt-1 shrink-0" />
-            <span><strong className="text-gray-200">Semi 1:</strong> 1º Zona B vs Ganador Repechaje</span>
+            <span><strong className="text-gray-200">Semi 1:</strong> Ganador C1 vs Ganador C3</span>
           </div>
           <div className="flex gap-2">
             <span className="w-2 h-2 rounded-full bg-purple-400 mt-1 shrink-0" />
-            <span><strong className="text-gray-200">Semi 2:</strong> 1º Zona C vs 1º Zona A</span>
+            <span><strong className="text-gray-200">Semi 2:</strong> Ganador C2 vs Ganador C4</span>
           </div>
           <div className="flex gap-2">
             <span className="w-2 h-2 rounded-full bg-yellow-400 mt-1 shrink-0" />

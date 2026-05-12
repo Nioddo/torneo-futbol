@@ -4,27 +4,33 @@ const ZONES = [
   {
     zone: 'A', color: 'bg-blue-600/80',
     teams: [
-      { name: 'Planeta Thcia',   year: '2º' },
-      { name: 'Los Sumatorias',  year: '2º' },
-      { name: 'Los Secanucas',   year: '2º' },
-      { name: 'Palangana',       year: '1º' },
+      { name: 'Planeta Thcia',  year: '2º' },
+      { name: 'Los Sumatorias', year: '2º' },
+      { name: 'Palangana',      year: '1º' },
     ],
   },
   {
     zone: 'B', color: 'bg-purple-600/80',
     teams: [
-      { name: 'La mastur',   year: '3º' },
-      { name: 'Los +capitos', year: '1º' },
-      { name: 'Angry Kirk',  year: '2º' },
-      { name: '67 Maquinas', year: '1º' },
+      { name: 'La mastur',     year: '3º' },
+      { name: 'Los +capitos',  year: '1º' },
+      { name: 'Angry Kirk',    year: '2º' },
     ],
   },
   {
     zone: 'C', color: 'bg-orange-600/80',
     teams: [
-      { name: 'Milanesa',       year: '3º' },
-      { name: 'El suplantaso',  year: '3º' },
-      { name: 'La changuita',   year: '1º' },
+      { name: 'Milanesa',      year: '3º' },
+      { name: 'Los Secanucas', year: '2º' },
+      { name: '67 Maquinas',   year: '1º' },
+    ],
+  },
+  {
+    zone: 'D', color: 'bg-green-600/80',
+    teams: [
+      { name: 'El suplantaso', year: '3º' },
+      { name: 'La changuita',  year: '1º' },
+      { name: 'Kingnasir',     year: '2º' },
     ],
   },
 ];
@@ -65,35 +71,36 @@ export default function TournamentInfo() {
           <div className="px-4 py-3 flex gap-3">
             <span className="text-green-400 text-lg shrink-0">🏅</span>
             <div>
-              <p className="text-sm font-semibold text-white">Clasificados directos a Semifinales</p>
+              <p className="text-sm font-semibold text-white">Clasificados a Cuartos de Final</p>
               <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
-                <span className="text-blue-300 font-medium">1º Zona A</span>,{' '}
-                <span className="text-purple-300 font-medium">1º Zona B</span> y{' '}
-                <span className="text-orange-300 font-medium">1º Zona C</span>.
+                <span className="text-blue-300 font-medium">Top 2 Zona A</span>,{' '}
+                <span className="text-purple-300 font-medium">Top 2 Zona B</span>,{' '}
+                <span className="text-orange-300 font-medium">Top 2 Zona C</span> y{' '}
+                <span className="text-green-300 font-medium">Top 2 Zona D</span> — 8 equipos en total.
               </p>
             </div>
           </div>
 
           <div className="px-4 py-3 flex gap-3">
-            <span className="text-orange-400 text-lg shrink-0">⚡</span>
+            <span className="text-cyan-400 text-lg shrink-0">⚔️</span>
             <div>
-              <p className="text-sm font-semibold text-white">Repechaje (Play-in) — 4º cupo</p>
-              <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
-                <span className="text-orange-300 font-medium">2º Zona C</span> vs{' '}
-                <span className="text-white font-medium">Mejor 2º</span> entre 2º Zona A y 2º Zona B
-                (mejor estadística: pts → dif. goles → goles a favor).
-                <br />El ganador va a <strong className="text-gray-200">Semifinal 1</strong>.
-              </p>
+              <p className="text-sm font-semibold text-white">Cruces de Cuartos de Final</p>
+              <div className="text-xs text-gray-400 mt-1 space-y-1">
+                <p>· <strong className="text-gray-200">C1:</strong> 1º Zona A vs 2º Zona B</p>
+                <p>· <strong className="text-gray-200">C2:</strong> 1º Zona B vs 2º Zona A</p>
+                <p>· <strong className="text-gray-200">C3:</strong> 1º Zona C vs 2º Zona D</p>
+                <p>· <strong className="text-gray-200">C4:</strong> 1º Zona D vs 2º Zona C</p>
+              </div>
             </div>
           </div>
 
           <div className="px-4 py-3 flex gap-3">
             <span className="text-purple-400 text-lg shrink-0">🔀</span>
             <div>
-              <p className="text-sm font-semibold text-white">Cruces de Semifinales (protegidos)</p>
+              <p className="text-sm font-semibold text-white">Cruces de Semifinales</p>
               <div className="text-xs text-gray-400 mt-1 space-y-1">
-                <p>· <strong className="text-gray-200">Semi 1:</strong> 1º Zona B vs Ganador Repechaje</p>
-                <p>· <strong className="text-gray-200">Semi 2:</strong> 1º Zona C vs 1º Zona A</p>
+                <p>· <strong className="text-gray-200">Semi 1:</strong> Ganador C1 vs Ganador C3</p>
+                <p>· <strong className="text-gray-200">Semi 2:</strong> Ganador C2 vs Ganador C4</p>
               </div>
             </div>
           </div>

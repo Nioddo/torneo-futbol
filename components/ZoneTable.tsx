@@ -15,7 +15,8 @@ export default function ZoneTable({ zone, standings, highlightTeams = [] }: Zone
       <div className={`px-4 py-2 font-bold text-sm tracking-wider ${
         zone === 'A' ? 'bg-blue-600/80' :
         zone === 'B' ? 'bg-purple-600/80' :
-        'bg-orange-600/80'
+        zone === 'C' ? 'bg-orange-600/80' :
+        'bg-green-600/80'
       }`}>
         ZONA {zone}
       </div>

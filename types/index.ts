@@ -1,4 +1,4 @@
-export type Phase = 'group' | 'repechaje' | 'semi' | 'final';
+export type Phase = 'group' | 'quarter' | 'semi' | 'final';
 
 export interface Match {
   id: string;

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Match } from '@/types';
 import { supabase } from '@/lib/supabase';
-import { calcStandings, getBest2nd, buildLocalMatches } from '@/lib/tournament';
+  import { calcStandings, buildLocalMatches } from '@/lib/tournament';
 import PinModal from '@/components/PinModal';
 import ZoneTable from '@/components/ZoneTable';
 import BracketView from '@/components/BracketView';
@@ -69,13 +69,14 @@ export default function Home() {
   const standingsA = calcStandings(matches, 'A');
   const standingsB = calcStandings(matches, 'B');
   const standingsC = calcStandings(matches, 'C');
-  const best2nd = getBest2nd(standingsA, standingsB);
+  const standingsD = calcStandings(matches, 'D');
 
+  // Clasificados a cuartos: top 2 de cada zona (8 equipos)
   const classified: string[] = [
-    standingsA[0]?.team,
-    standingsB[0]?.team,
-    standingsC[0]?.team,
-    best2nd?.team ?? '',
+    standingsA[0]?.team, standingsA[1]?.team,
+    standingsB[0]?.team, standingsB[1]?.team,
+    standingsC[0]?.team, standingsC[1]?.team,
+    standingsD[0]?.team, standingsD[1]?.team,
   ].filter(Boolean);
 
   return (
@@ -165,29 +166,17 @@ export default function Home() {
                 standingsA={standingsA}
                 standingsB={standingsB}
                 standingsC={standingsC}
-                best2nd={best2nd}
+                standingsD={standingsD}
               />
             )}
 
             {activeTab === 'standings' && (
               <div className="space-y-4">
-                {best2nd && (
-                  <div className="bg-orange-900/20 border border-orange-700/40 rounded-xl px-4 py-3 flex items-start gap-3">
-                    <span className="text-orange-400 text-lg shrink-0">⚡</span>
-                    <div>
-                      <p className="text-xs font-bold text-orange-400 uppercase tracking-wider">Repechaje — Mejor 2º (Zona A o B)</p>
-                      <p className="text-sm text-white font-semibold">{best2nd.team}</p>
-                      <p className="text-xs text-gray-400">
-                        {best2nd.points} pts · DG: {best2nd.gd > 0 ? '+' : ''}{best2nd.gd} · GF: {best2nd.gf}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">Juega el Repechaje vs 2º Zona C</p>
-                    </div>
-                  </div>
-                )}
                 <ZoneTable zone="A" standings={standingsA} highlightTeams={classified} />
                 <ZoneTable zone="B" standings={standingsB} highlightTeams={classified} />
                 <ZoneTable zone="C" standings={standingsC} highlightTeams={classified} />
-                <p className="text-xs text-gray-500 text-center pt-2">✓ = Clasificado directo a Semifinales</p>
+                <ZoneTable zone="D" standings={standingsD} highlightTeams={classified} />
+                <p className="text-xs text-gray-500 text-center pt-2">✓ = Clasificado a Cuartos de Final (top 2 de cada zona)</p>
               </div>
             )}
 
@@ -199,7 +188,7 @@ export default function Home() {
                 standingsA={standingsA}
                 standingsB={standingsB}
                 standingsC={standingsC}
-                best2nd={best2nd}
+                standingsD={standingsD}
               />
             )}
 
